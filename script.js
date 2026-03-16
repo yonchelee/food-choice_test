@@ -207,12 +207,96 @@ searchBtn.addEventListener('click', () => {
     displayImmediateResults();
 });
 
+// 카카오 장소 검색 객체를 저장할 변수
+let ps;
+
 function displayImmediateResults() {
-    // 추천 식당 생성
-    const recommendations = generateRecommendations();
+    resultDiv.innerHTML = '<div style="text-align: center; padding: 20px;">검색 중입니다... 🔄<br><br><span style="font-size:0.8rem;color:#888;">(카카오 API 키가 설정되지 않은 경우 데모 데이터가 표시됩니다)</span></div>';
     
-    // 결과 표시
-    displayResults(recommendations);
+    // 카카오맵 JavaScript API 및 services 라이브러리가 로드되었는지 확인
+    if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.services) {
+        if (!ps) {
+            ps = new kakao.maps.services.Places(); 
+        }
+
+        let keyword = `${state.location} 맛집`;
+        if (state.menu) {
+            keyword += ` ${state.menu}`;
+        }
+        
+        // 장소검색 요청
+        ps.keywordSearch(keyword, placesSearchCB); 
+    } else {
+        // API 키가 없거나 스크립트 로드에 실패한 경우 기존 동작 방식 유지(데모)
+        setTimeout(() => {
+            const recommendations = generateRecommendations();
+            displayResults(recommendations);
+        }, 800);
+    }
+}
+
+// 카카오 장소검색 콜백 함수
+function placesSearchCB(data, status, pagination) {
+    if (status === kakao.maps.services.Status.OK) {
+        displayKakaoResults(data);
+    } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+        resultDiv.innerHTML = '<p style="text-align: center; padding: 20px;">결과가 존재하지 않습니다.</p>';
+    } else if (status === kakao.maps.services.Status.ERROR) {
+        resultDiv.innerHTML = '<p style="text-align: center; padding: 20px; color: #e74c3c;">검색 중 오류가 발생했습니다.<br>카카오맵 API 키가 유효하지 않을 수 있습니다.</p>';
+    }
+}
+
+// 카카오 검색 결과 화면 표시 함수
+function displayKakaoResults(places) {
+    let html = `
+        <div style="margin-bottom: 20px; color: #667eea; font-weight: bold; font-size: 1.2rem;">
+            📍 ${state.location} | 👥 ${state.peopleCount}명 ${state.menu ? `| 🍽️ ${state.menu}` : ''}
+        </div>
+        <div class="kakao-results-list" style="display: flex; flex-direction: column; gap: 15px;">
+    `;
+
+    // 상위 5개 표시
+    const topPlaces = places.slice(0, 5);
+
+    topPlaces.forEach((place, index) => {
+        html += `
+            <div class="result-card" style="text-align: left; position: relative; padding: 20px; border-radius: 12px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <h3 style="margin-bottom: 8px; font-size: 1.3rem;">
+                    <a href="${place.place_url}" target="_blank" style="text-decoration: none; color: #2c3e50;">
+                        ${index + 1}. ${place.place_name}
+                    </a>
+                </h3>
+                <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 12px;">${place.category_name}</p>
+                
+                <div class="details" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                    <div class="detail-item" style="flex: 1; min-width: 120px;">
+                        <span style="display: block; font-size: 0.8rem; color: #95a5a6; margin-bottom: 4px;">주소</span>
+                        <strong style="font-size: 0.9rem; color: #34495e;">${place.road_address_name || place.address_name}</strong>
+                    </div>
+                    <div class="detail-item" style="flex: 1; min-width: 120px;">
+                        <span style="display: block; font-size: 0.8rem; color: #95a5a6; margin-bottom: 4px;">전화번호</span>
+                        <strong style="font-size: 0.9rem; color: #34495e;">${place.phone || '정보 없음'}</strong>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px; text-align: right;">
+                    <a href="${place.place_url}" target="_blank" 
+                       style="display: inline-block; padding: 8px 16px; background: #FEE500; color: #000000; text-decoration: none; border-radius: 6px; font-size: 0.95rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s;">
+                        📍 카카오맵에서 상세 보기
+                    </a>
+                </div>
+            </div>
+        `;
+    });
+
+    html += `
+        </div>
+        <div style="margin-top: 25px; padding: 15px; background: rgba(254, 229, 0, 0.15); border: 1px solid #FEE500; border-radius: 10px; color: #333; text-align: center; font-weight: bold;">
+            💛 카카오 장소 검색 API를 통해 실시간 맛집 정보를 가져왔습니다!
+        </div>
+    `;
+
+    resultDiv.innerHTML = html;
 }
 
 function generateRecommendations() {
