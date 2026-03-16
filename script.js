@@ -63,6 +63,8 @@ function initMap() {
 // 페이지 로드 시 지도 초기화
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
+    // 초기 사람 아이콘 표시
+    updatePeopleAnimation(state.peopleCount);
 });
 
 // 인원 선택 기능
@@ -74,6 +76,7 @@ decreaseBtn.addEventListener('click', () => {
     if (state.peopleCount > 1) {
         state.peopleCount--;
         peopleCountInput.value = state.peopleCount;
+        updatePeopleAnimation(state.peopleCount);
     }
 });
 
@@ -81,6 +84,7 @@ increaseBtn.addEventListener('click', () => {
     if (state.peopleCount < 50) {
         state.peopleCount++;
         peopleCountInput.value = state.peopleCount;
+        updatePeopleAnimation(state.peopleCount);
     }
 });
 
@@ -90,6 +94,7 @@ peopleCountInput.addEventListener('change', (e) => {
     if (value > 50) value = 50;
     state.peopleCount = value;
     peopleCountInput.value = value;
+    updatePeopleAnimation(state.peopleCount);
 });
 
 // 위치 선택 기능
@@ -524,4 +529,38 @@ function displayResults(recommendations) {
     `;
     
     resultDiv.innerHTML = html;
+}
+
+// 사람 아이콘 애니메이션 업데이트 함수
+function updatePeopleAnimation(count) {
+    const animationContainer = document.getElementById('people-animation');
+    if (!animationContainer) return;
+    
+    // 현재 표시된 사람 아이콘 수 확인
+    const currentIcons = animationContainer.querySelectorAll('.person-icon').length;
+    
+    // 인원 수에 따라 아이콘 추가 또는 제거
+    if (count > currentIcons) {
+        // 인원이 늘어나면 아이콘 추가
+        for (let i = currentIcons; i < count; i++) {
+            addPersonIcon(animationContainer, i);
+        }
+    } else if (count < currentIcons) {
+        // 인원이 줄어들면 아이콘 제거
+        const icons = animationContainer.querySelectorAll('.person-icon');
+        for (let i = currentIcons - 1; i >= count; i--) {
+            if (icons[i]) {
+                icons[i].remove();
+            }
+        }
+    }
+}
+
+// 사람 아이콘 추가 함수
+function addPersonIcon(container, index) {
+    const personIcon = document.createElement('div');
+    personIcon.className = 'person-icon';
+    personIcon.innerHTML = '🧑';
+    personIcon.style.animationDelay = `${index * 0.1}s`;
+    container.appendChild(personIcon);
 }

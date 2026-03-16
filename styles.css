@@ -57,6 +57,70 @@ header p {
     min-width: 300px;
 }
 
+/* 인원 섹션 - 크기 조절 */
+.people-section {
+    flex: 0.7;
+    min-width: 280px;
+}
+
+/* 셔틀고 섹션 */
+.shuttle-section {
+    margin-top: 20px;
+}
+
+.shuttle-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.shuttle-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 2px solid transparent;
+    border-radius: 15px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.shuttle-link:hover {
+    border-color: #667eea;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.shuttle-icon {
+    font-size: 3rem;
+    flex-shrink: 0;
+}
+
+.shuttle-content {
+    flex: 1;
+}
+
+.shuttle-content h3 {
+    color: #667eea;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+.shuttle-content p {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.shuttle-arrow {
+    font-size: 2rem;
+    color: #667eea;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
 .section h2 {
     color: #667eea;
     font-size: 1.4rem;
@@ -141,6 +205,43 @@ header p {
 .capacity-info p {
     color: #555;
     font-size: 0.9rem;
+}
+
+/* 사람 아이콘 애니메이션 */
+.people-animation {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+    min-height: 60px;
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%);
+    border-radius: 15px;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.person-icon {
+    font-size: 2rem;
+    animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: inline-block;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    transition: transform 0.2s;
+}
+
+.person-icon:hover {
+    transform: scale(1.2) rotate(5deg);
+}
+
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: scale(0) rotate(-180deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
 }
 
 /* 지도 스타일 */
